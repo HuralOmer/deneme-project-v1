@@ -1,9 +1,10 @@
 /**
- * Shopify Tracking App - Test Server
- * Railway deployment için basit test server
+ * Shopify Tracking App - Entry Point
+ * Railway deployment için
  */
 
 import { createRequire } from 'module';
+import path from 'path';
 import dotenv from 'dotenv';
 
 // ES modules için require polyfill
@@ -12,57 +13,40 @@ const require = createRequire(import.meta.url);
 // Environment variables yükle
 dotenv.config();
 
-console.log('🚀 Starting Test Server...');
-console.log('Environment check:');
-console.log('- NODE_ENV:', process.env.NODE_ENV);
-console.log('- PORT:', process.env.PORT);
-console.log('- REDIS_URL:', process.env.REDIS_URL ? 'Set' : 'Not set');
-console.log('- SUPABASE_URL:', process.env.SUPABASE_URL ? 'Set' : 'Not set');
+// TypeScript build edilmiş dosyayı import et
+const { default: ShopifyTrackingServer } = await import('./dist/app/server.js');
 
-// Basit HTTP server
-import http from 'http';
-
-const server = http.createServer((req, res) => {
-  if (req.url === '/health') {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ 
-      status: 'ok', 
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime()
-    }));
-  } else {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ 
-      message: 'Test Server is running!',
-      timestamp: new Date().toISOString()
-    }));
-  }
-});
-
-const port = process.env.PORT || 3000;
-const host = '0.0.0.0';
-
-server.listen(port, host, () => {
-  console.log(`✅ Test server başlatıldı: http://${host}:${port}`);
-  console.log(`✅ Health check: http://${host}:${port}/health`);
-});
+// Server instance oluştur
+const server = new ShopifyTrackingServer();
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
+process.on('SIGTERM', async () => {
   console.log('SIGTERM sinyali alındı, server kapatılıyor...');
-  server.close(() => {
-    process.exit(0);
-  });
+  await server.stop();
+  process.exit(0);
 });
 
-process.on('SIGINT', () => {
+process.on('SIGINT', async () => {
   console.log('SIGINT sinyali alındı, server kapatılıyor...');
-  server.close(() => {
-    process.exit(0);
-  });
+  await server.stop();
+  process.exit(0);
 });
 
 process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error);
+  process.exit(1);
+});
+
+// Server'ı başlat
+console.log('🚀 Starting Shopify Tracking App...');
+console.log('Environment check:');
+console.log('- NODE_ENV:', process.env.NODE_ENV);
+console.log('- PORT:', process.env.PORT);
+console.log('- SUPABASE_URL:', process.env.SUPABASE_URL ? 'Set' : 'Not set');
+console.log('- REDIS_URL:', process.env.REDIS_URL ? 'Set' : 'Not set');
+
+server.start().catch((error) => {
+  console.error('❌ Failed to start server:', error);
+  console.error('Error details:', error.stack);
   process.exit(1);
 });
