@@ -3,8 +3,8 @@
  */
 
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { PresenceTracker } from './presence';
-import { calculateEMA, updateState } from './ema';
+import { PresenceTracker } from './presence.js';
+import { calculateEMA, updateState } from './ema.js';
 import { 
   HeartbeatPayload, 
   PresenceResponse, 

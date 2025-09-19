@@ -2,8 +2,8 @@
  * Active Users Tracking - EMA (Exponential Moving Average) Algorithm
  */
 
-import { EMAResult, ActiveUsersState } from './types';
-import { EMA_TAU_FAST, EMA_TAU_SLOW, TREND_THRESHOLDS } from './constants';
+import { EMAResult, ActiveUsersState } from './types.js';
+import { EMA_TAU_FAST, EMA_TAU_SLOW, TREND_THRESHOLDS } from './constants.js';
 
 /**
  * Sürekli zaman katsayısı hesaplama

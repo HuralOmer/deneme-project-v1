@@ -3,7 +3,7 @@
  */
 
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { ApiResponse, ShopifyWebhook } from '../types';
+import { ApiResponse, ShopifyWebhook } from '../types/index.js';
 
 // Shopify webhook request interface
 interface WebhookRequest {

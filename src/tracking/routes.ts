@@ -3,7 +3,7 @@
  */
 
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { ApiResponse, PageAnalytics, EcommerceEvent, UserSession } from '../types';
+import { ApiResponse, PageAnalytics, EcommerceEvent, UserSession } from '../types/index.js';
 
 // Sayfa analitik verisi gönderme
 interface PageAnalyticsRequest {

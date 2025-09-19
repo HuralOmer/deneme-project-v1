@@ -2,8 +2,8 @@
  * Active Users Tracking - Presence Tracking Logic
  */
 
-import { PresenceData, ActiveUsersState } from './types';
-import { REDIS_KEYS, TTL_MS, MAX_AGE_MS } from './constants';
+import { PresenceData, ActiveUsersState } from './types.js';
+import { REDIS_KEYS, TTL_MS, MAX_AGE_MS } from './constants.js';
 
 /**
  * Redis client interface (Upstash Redis için)

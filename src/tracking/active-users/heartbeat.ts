@@ -2,8 +2,8 @@
  * Active Users Tracking - Heartbeat Mechanism
  */
 
-import { HeartbeatPayload, PresenceData } from './types';
-import { HEARTBEAT_MS, JITTER_MS, ACTIVITY_TIMEOUT_MS } from './constants';
+import { HeartbeatPayload, PresenceData } from './types.js';
+import { HEARTBEAT_MS, JITTER_MS, ACTIVITY_TIMEOUT_MS } from './constants.js';
 
 /**
  * Heartbeat manager sınıfı

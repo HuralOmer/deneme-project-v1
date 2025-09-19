@@ -6,8 +6,8 @@ import Fastify, { FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
-import { config, validateConfig } from './config';
-import { ApiResponse } from '../types';
+import { config, validateConfig } from './config.js';
+import { ApiResponse } from '../types/index.js';
 
 class ShopifyTrackingServer {
   private fastify: FastifyInstance;
@@ -150,21 +150,21 @@ class ShopifyTrackingServer {
     });
 
     // Extensions routes (theme app extension)
-    const extensionsRoutes = await import('../extensions/routes');
-    this.fastify.register(extensionsRoutes.default, { prefix: '/extensions' });
+        const extensionsRoutes = await import('../extensions/routes.js');
+        this.fastify.register(extensionsRoutes.default, { prefix: '/extensions' });
 
     // API routes
     this.fastify.register(async (fastify) => {
       // Active Users endpoints
-      const activeUsersRoutes = await import('../tracking/active-users/routes');
+      const activeUsersRoutes = await import('../tracking/active-users/routes.js');
       fastify.register(activeUsersRoutes.default, { prefix: '/tracking' });
       
       // Tracking endpoints (legacy)
-      const trackingRoutes = await import('../tracking/routes');
+      const trackingRoutes = await import('../tracking/routes.js');
       fastify.register(trackingRoutes.default, { prefix: '/tracking' });
       
       // Webhook endpoints
-      const webhookRoutes = await import('../extensions/routes');
+      const webhookRoutes = await import('../extensions/routes.js');
       fastify.register(webhookRoutes.default, { prefix: '/webhooks' });
     }, { prefix: '/api' });
   }
