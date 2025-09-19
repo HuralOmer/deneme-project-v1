@@ -1,8 +1,3 @@
-/**
- * Shopify Tracking App - Test Server
- * Railway deployment için basit test server
- */
-
 import { createRequire } from 'module';
 import dotenv from 'dotenv';
 
@@ -60,9 +55,4 @@ process.on('SIGINT', () => {
   server.close(() => {
     process.exit(0);
   });
-});
-
-process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
-  process.exit(1);
 });
