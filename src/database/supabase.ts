@@ -3,7 +3,6 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import type { Database } from '../types/database';
 
 // Environment variables
 const supabaseUrl = process.env.SUPABASE_URL;
