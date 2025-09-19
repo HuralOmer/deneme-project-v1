@@ -75,17 +75,30 @@ export function validateConfig(): void {
     return;
   }
   
-  // Production modunda zorunlu
+  // Production modunda zorunlu (sadece Active Users Tracking için)
   const required = [
-    'SHOPIFY_API_KEY',
-    'SHOPIFY_API_SECRET',
-    'DATABASE_URL',
+    'SUPABASE_URL',
+    'REDIS_URL',
   ];
   
   const missing = required.filter(key => !process.env[key]);
   
   if (missing.length > 0) {
     throw new Error(`Eksik environment variables: ${missing.join(', ')}`);
+  }
+  
+  // Shopify ve Database ayarları opsiyonel (sadece uyarı ver)
+  const optional = [
+    'SHOPIFY_API_KEY',
+    'SHOPIFY_API_SECRET',
+    'DATABASE_URL',
+  ];
+  
+  const missingOptional = optional.filter(key => !process.env[key]);
+  
+  if (missingOptional.length > 0) {
+    console.warn(`⚠️  Opsiyonel environment variables eksik: ${missingOptional.join(', ')}`);
+    console.warn('   Bu özellikler devre dışı kalacak.');
   }
 }
 
