@@ -83,7 +83,7 @@ export function calculateEMA(
  * @returns Güncellenmiş state
  */
 export function updateState(
-  state: ActiveUsersState | null,
+  _state: ActiveUsersState | null,
   emaResult: EMAResult,
   shop: string
 ): ActiveUsersState {

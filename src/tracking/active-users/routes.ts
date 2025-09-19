@@ -11,7 +11,7 @@ import {
   HeartbeatResponse,
   PresenceStreamData 
 } from './types';
-import { REDIS_KEYS } from './constants';
+// import { REDIS_KEYS } from './constants';
 
 // Heartbeat request interface
 interface HeartbeatRequest {
@@ -28,14 +28,14 @@ interface StreamRequest {
 export default async function activeUsersRoutes(fastify: FastifyInstance) {
   // Redis client (Upstash Redis için mock - gerçek implementasyon gerekli)
   const redisClient = {
-    zadd: async (key: string, score: number, member: string) => 1,
-    zrem: async (key: string, member: string) => 1,
-    zcount: async (key: string, min: number, max: number) => Math.floor(Math.random() * 50) + 10, // Mock data
-    zremrangebyscore: async (key: string, min: number, max: number) => 0,
-    hset: async (key: string, field: string, value: string) => 1,
-    hget: async (key: string, field: string) => null,
-    hgetall: async (key: string) => ({}),
-    publish: async (channel: string, message: string) => 1,
+    zadd: async (_key: string, _score: number, _member: string) => 1,
+    zrem: async (_key: string, _member: string) => 1,
+    zcount: async (_key: string, _min: number, _max: number) => Math.floor(Math.random() * 50) + 10, // Mock data
+    zremrangebyscore: async (_key: string, _min: number, _max: number) => 0,
+    hset: async (_key: string, _field: string, _value: string) => 1,
+    hget: async (_key: string, _field: string) => null,
+    hgetall: async (_key: string) => ({}),
+    publish: async (_channel: string, _message: string) => 1,
   };
 
   const presenceTracker = new PresenceTracker(redisClient);

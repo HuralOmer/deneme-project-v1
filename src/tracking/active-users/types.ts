@@ -8,8 +8,8 @@ export interface PresenceData {
   sessionId: string;
   shop: string;
   timestamp: number;
-  userAgent?: string;
-  ipAddress?: string;
+  userAgent?: string | undefined;
+  ipAddress?: string | undefined;
   lastActivity: number;
 }
 
