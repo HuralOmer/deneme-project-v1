@@ -27,15 +27,22 @@ class ShopifyTrackingServer {
    */
   async start(): Promise<void> {
     try {
+      console.log('📋 Validating configuration...');
       // Konfigürasyonu doğrula
       validateConfig();
+      console.log('✅ Configuration validated');
 
+      console.log('🔌 Registering plugins...');
       // Plugin'leri kaydet
       await this.registerPlugins();
+      console.log('✅ Plugins registered');
 
+      console.log('🛣️ Registering routes...');
       // Route'ları kaydet
       await this.registerRoutes();
+      console.log('✅ Routes registered');
 
+      console.log(`🌐 Starting server on ${config.host}:${config.port}...`);
       // Server'ı dinlemeye başla
       await this.fastify.listen({
         port: config.port,
@@ -43,8 +50,10 @@ class ShopifyTrackingServer {
       });
 
       this.isRunning = true;
+      console.log(`🚀 Shopify Tracking App server başlatıldı: http://${config.host}:${config.port}`);
       this.fastify.log.info(`🚀 Shopify Tracking App server başlatıldı: http://${config.host}:${config.port}`);
     } catch (error) {
+      console.error('❌ Server başlatılamadı:', error);
       this.fastify.log.error(error as Error, 'Server başlatılamadı');
       throw error;
     }
