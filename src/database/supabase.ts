@@ -3,7 +3,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { Database } from '../types/database';
+import type { Database } from '../types/database';
 
 // Environment variables
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -14,131 +14,14 @@ if (!supabaseUrl || !supabaseServiceKey) {
 }
 
 // Supabase client oluştur
-export const supabase = createClient<Database>(supabaseUrl, supabaseServiceKey, {
+export const supabase = createClient(supabaseUrl, supabaseServiceKey, {
   auth: {
     autoRefreshToken: false,
     persistSession: false
   }
 });
 
-// Database tipleri
-export interface Database {
-  public: {
-    Tables: {
-      active_users_minutely: {
-        Row: {
-          id: number;
-          shop: string;
-          bucket_ts: string;
-          au_raw: number;
-          total_tabs: number;
-          au_ema_fast: number;
-          au_ema_slow: number;
-          window_seconds: number;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: number;
-          shop: string;
-          bucket_ts: string;
-          au_raw?: number;
-          total_tabs?: number;
-          au_ema_fast?: number;
-          au_ema_slow?: number;
-          window_seconds?: number;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: number;
-          shop?: string;
-          bucket_ts?: string;
-          au_raw?: number;
-          total_tabs?: number;
-          au_ema_fast?: number;
-          au_ema_slow?: number;
-          window_seconds?: number;
-          created_at?: string;
-          updated_at?: string;
-        };
-      };
-      active_users_daily: {
-        Row: {
-          id: number;
-          shop: string;
-          day: string;
-          avg_au_raw: number;
-          p95_au_raw: number;
-          max_au_raw: number;
-          max_au_raw_at: string | null;
-          avg_au_ema: number;
-          minutes_observed: number;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: number;
-          shop: string;
-          day: string;
-          avg_au_raw?: number;
-          p95_au_raw?: number;
-          max_au_raw?: number;
-          max_au_raw_at?: string | null;
-          avg_au_ema?: number;
-          minutes_observed?: number;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: number;
-          shop?: string;
-          day?: string;
-          avg_au_raw?: number;
-          p95_au_raw?: number;
-          max_au_raw?: number;
-          max_au_raw_at?: string | null;
-          avg_au_ema?: number;
-          minutes_observed?: number;
-          created_at?: string;
-          updated_at?: string;
-        };
-      };
-      active_users_state: {
-        Row: {
-          id: number;
-          shop: string;
-          last_timestamp: number;
-          ema_fast: number;
-          ema_slow: number;
-          last_raw_count: number;
-          created_at: string;
-          updated_at: string;
-        };
-        Insert: {
-          id?: number;
-          shop: string;
-          last_timestamp: number;
-          ema_fast?: number;
-          ema_slow?: number;
-          last_raw_count?: number;
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: {
-          id?: number;
-          shop?: string;
-          last_timestamp?: number;
-          ema_fast?: number;
-          ema_slow?: number;
-          last_raw_count?: number;
-          created_at?: string;
-          updated_at?: string;
-        };
-      };
-    };
-  };
-}
+// Database tipleri artık ayrı dosyadan import ediliyor
 
 // Database helper fonksiyonları
 export class DatabaseService {
@@ -158,7 +41,7 @@ export class DatabaseService {
   }) {
     const { data: result, error } = await this.supabase
       .from('active_users_minutely')
-      .upsert({
+      .insert({
         shop: data.shop,
         bucket_ts: data.bucket_ts.toISOString(),
         au_raw: data.au_raw,
@@ -166,8 +49,6 @@ export class DatabaseService {
         au_ema_fast: data.au_ema_fast,
         au_ema_slow: data.au_ema_slow,
         window_seconds: data.window_seconds || 60,
-      }, {
-        onConflict: 'shop,bucket_ts'
       });
 
     if (error) {
@@ -192,7 +73,7 @@ export class DatabaseService {
   }) {
     const { data: result, error } = await this.supabase
       .from('active_users_daily')
-      .upsert({
+      .insert({
         shop: data.shop,
         day: data.day.toISOString().split('T')[0], // YYYY-MM-DD format
         avg_au_raw: data.avg_au_raw,
@@ -201,8 +82,6 @@ export class DatabaseService {
         max_au_raw_at: data.max_au_raw_at.toISOString(),
         avg_au_ema: data.avg_au_ema,
         minutes_observed: data.minutes_observed,
-      }, {
-        onConflict: 'shop,day'
       });
 
     if (error) {
@@ -224,14 +103,12 @@ export class DatabaseService {
   }) {
     const { data: result, error } = await this.supabase
       .from('active_users_state')
-      .upsert({
+      .insert({
         shop: data.shop,
         last_timestamp: data.last_timestamp,
         ema_fast: data.ema_fast,
         ema_slow: data.ema_slow,
         last_raw_count: data.last_raw_count,
-      }, {
-        onConflict: 'shop'
       });
 
     if (error) {
