@@ -3,17 +3,18 @@
  * Railway deployment için
  */
 
-const { createRequire } = require('module');
-const path = require('path');
+import { createRequire } from 'module';
+import path from 'path';
+import dotenv from 'dotenv';
 
 // ES modules için require polyfill
 const require = createRequire(import.meta.url);
 
 // Environment variables yükle
-require('dotenv').config();
+dotenv.config();
 
 // TypeScript build edilmiş dosyayı import et
-const { default: ShopifyTrackingServer } = require('./dist/app/server.js');
+const { default: ShopifyTrackingServer } = await import('./dist/app/server.js');
 
 // Server instance oluştur
 const server = new ShopifyTrackingServer();
