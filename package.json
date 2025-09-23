@@ -29,6 +29,7 @@
   "author": "Your Name",
   "license": "MIT",
   "dependencies": {
+    "@fastify/cookie": "^11.0.2",
     "@fastify/cors": "^8.4.0",
     "@fastify/helmet": "^11.1.1",
     "@fastify/rate-limit": "^9.1.0",
