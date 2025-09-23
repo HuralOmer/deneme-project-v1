@@ -6,7 +6,6 @@ import Fastify, { FastifyInstance } from 'fastify';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
-import cookie from '@fastify/cookie';
 import { config, validateConfig } from './config.js';
 import { ApiResponse } from '../types/index.js';
 
@@ -77,11 +76,6 @@ class ShopifyTrackingServer {
   private async registerPlugins(): Promise<void> {
     // CORS
     await this.fastify.register(cors, config.cors);
-
-    // Cookie support
-    await this.fastify.register(cookie, {
-      secret: config.shopify.apiSecret, // Cookie signing secret
-    });
 
     // Helmet (Güvenlik)
     await this.fastify.register(helmet, {
