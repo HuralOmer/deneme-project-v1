@@ -272,6 +272,45 @@ export default async function activeUsersRoutes(fastify: FastifyInstance) {
     }
   });
 
+  // Active users count endpoint (legacy)
+  fastify.get<StreamRequest>('/count', {
+    schema: {
+      querystring: {
+        type: 'object',
+        properties: {
+          shop: { type: 'string' },
+        },
+      },
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            count: { type: 'number' },
+            timestamp: { type: 'number' },
+          },
+        },
+      },
+    },
+  }, async (request: FastifyRequest<StreamRequest>, reply: FastifyReply) => {
+    try {
+      const { shop = 'default-shop' } = request.query;
+      
+      const activeUsers = await presenceTracker.getActiveVisitorCount(shop);
+      
+      return reply.code(200).send({
+        count: activeUsers,
+        timestamp: Date.now(),
+      });
+    } catch (error) {
+      fastify.log.error(error as Error, 'Active users count error');
+      
+      return reply.code(500).send({
+        count: 0,
+        timestamp: Date.now(),
+      });
+    }
+  });
+
   // Active users count endpoint
   fastify.get<StreamRequest>('/presence/count', {
     schema: {

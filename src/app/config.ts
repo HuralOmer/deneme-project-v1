@@ -45,13 +45,7 @@ export const config = {
   
   // CORS ayarları
   cors: {
-    origin: process.env.CORS_ORIGIN?.split(',') || [
-      'http://localhost:3000',
-      'https://hural-software.myshopify.com',
-      'https://*.myshopify.com',
-      'https://shopify.dev',
-      'https://*.shopify.dev'
-    ],
+    origin: true, // Tüm origin'lere izin ver (development için)
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Shopify-Hmac-Sha256', 'X-Shopify-Shop-Domain', 'X-Shopify-Access-Token'],

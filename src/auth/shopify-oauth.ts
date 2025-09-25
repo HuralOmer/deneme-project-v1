@@ -135,7 +135,7 @@ export class ShopifyOAuth {
       throw new Error(`Token exchange failed: ${response.statusText}`);
     }
 
-    const data = await response.json();
+    const data = await response.json() as { access_token: string };
     return data.access_token;
   }
 
