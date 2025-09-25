@@ -45,8 +45,8 @@ export const config = {
   
   // CORS ayarları
   cors: {
-    origin: true, // Tüm origin'lere izin ver (development için)
-    credentials: true,
+    origin: "*", // Tüm origin'lere izin ver
+    credentials: false, // origin: "*" ile credentials: true kullanılamaz
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Shopify-Hmac-Sha256', 'X-Shopify-Shop-Domain', 'X-Shopify-Access-Token'],
   },
