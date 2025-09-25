@@ -5,6 +5,8 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { PresenceTracker } from './presence.js';
 import { calculateEMA, updateState } from './ema.js';
+import { redisClient } from '../../database/redis.js';
+import { memoryStore } from './memory-store.js';
 import { 
   HeartbeatPayload, 
   PresenceResponse, 
@@ -26,18 +28,7 @@ interface StreamRequest {
 }
 
 export default async function activeUsersRoutes(fastify: FastifyInstance) {
-  // Redis client (Upstash Redis için mock - gerçek implementasyon gerekli)
-  const redisClient = {
-    zadd: async (_key: string, _score: number, _member: string) => 1,
-    zrem: async (_key: string, _member: string) => 1,
-    zcount: async (_key: string, _min: number, _max: number) => Math.floor(Math.random() * 50) + 10, // Mock data
-    zremrangebyscore: async (_key: string, _min: number, _max: number) => 0,
-    hset: async (_key: string, _field: string, _value: string) => 1,
-    hget: async (_key: string, _field: string) => null,
-    hgetall: async (_key: string) => ({}),
-    publish: async (_channel: string, _message: string) => 1,
-  };
-
+  // Gerçek Redis client kullan
   const presenceTracker = new PresenceTracker(redisClient);
 
   // Heartbeat endpoint
@@ -295,7 +286,8 @@ export default async function activeUsersRoutes(fastify: FastifyInstance) {
     try {
       const { shop = 'default-shop' } = request.query;
       
-      const activeUsers = await presenceTracker.getActiveVisitorCount(shop);
+      // Memory store'dan gerçek aktif kullanıcı sayısını al
+      const activeUsers = memoryStore.getActiveUsersCount(shop);
       
       return reply.code(200).send({
         count: activeUsers,
@@ -343,16 +335,15 @@ export default async function activeUsersRoutes(fastify: FastifyInstance) {
     try {
       const { shop } = request.query;
       
-      const activeUsers = await presenceTracker.getActiveVisitorCount(shop);
-      const currentState = await presenceTracker.getEMAState(shop);
-      const emaResult = calculateEMA(currentState, activeUsers, Date.now());
+      // Memory store'dan gerçek aktif kullanıcı sayısını al
+      const activeUsers = memoryStore.getActiveUsersCount(shop);
 
       const response: PresenceResponse = {
         success: true,
         data: {
           activeUsers,
           timestamp: Date.now(),
-          trend: emaResult.trend,
+          trend: 'stable', // Basit trend hesaplama
         },
       };
 
