@@ -246,21 +246,26 @@ export default async function extensionsRoutes(fastify: FastifyInstance) {
     
     // Page unload işlemi
     handleUnload: function() {
-      if (navigator.sendBeacon) {
-        const payload = {
-          visitorId: this.visitorId,
-          sessionId: this.sessionId,
-          shop: this.config.shop,
-          timestamp: Date.now(),
-          activity: 'unload',
-          userAgent: navigator.userAgent
-        };
-        
-        navigator.sendBeacon(
-          this.config.apiUrl + '/api/tracking/presence/bye',
-          JSON.stringify(payload)
-        );
-      }
+      const payload = {
+        visitorId: this.visitorId,
+        sessionId: this.sessionId,
+        shop: this.config.shop,
+        timestamp: Date.now(),
+        activity: 'unload',
+        userAgent: navigator.userAgent
+      };
+      
+      // sendBeacon yerine fetch kullan (daha güvenilir)
+      fetch(this.config.apiUrl + '/api/tracking/presence/beat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload),
+        keepalive: true // sendBeacon benzeri davranış
+      }).catch(error => {
+        console.log('Unload heartbeat failed:', error);
+      });
       
       // Heartbeat'i durdur
       if (this.heartbeatInterval) {
