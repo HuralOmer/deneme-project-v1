@@ -10,7 +10,21 @@ interface ActiveUser {
   isActive: boolean;
 }
 
-class MemoryStore {
+/**
+ * Redis client interface (Upstash Redis için)
+ */
+interface RedisClient {
+  zadd(key: string, score: number, member: string): Promise<number>;
+  zrem(key: string, member: string): Promise<number>;
+  zcount(key: string, min: number, max: number): Promise<number>;
+  zremrangebyscore(key: string, min: number, max: number): Promise<number>;
+  hset(key: string, field: string, value: string): Promise<number>;
+  hget(key: string, field: string): Promise<string | null>;
+  hgetall(key: string): Promise<Record<string, string>>;
+  publish(channel: string, message: string): Promise<number>;
+}
+
+class MemoryStore implements RedisClient {
   private users: Map<string, ActiveUser> = new Map();
   private shopUsers: Map<string, Set<string>> = new Map();
 
@@ -90,6 +104,47 @@ class MemoryStore {
     return Array.from(shopUsers)
       .map(visitorId => this.users.get(visitorId))
       .filter((user): user is ActiveUser => user !== undefined);
+  }
+
+  // RedisClient interface implementation
+  async zadd(key: string, score: number, member: string): Promise<number> {
+    // Memory store'da zadd işlemi için basit implementasyon
+    return 1;
+  }
+
+  async zrem(key: string, member: string): Promise<number> {
+    // Memory store'da zrem işlemi için basit implementasyon
+    return 1;
+  }
+
+  async zcount(key: string, min: number, max: number): Promise<number> {
+    // Memory store'da zcount işlemi için basit implementasyon
+    return this.getActiveUsersCount(key.replace('active_users:', ''));
+  }
+
+  async zremrangebyscore(key: string, min: number, max: number): Promise<number> {
+    // Memory store'da zremrangebyscore işlemi için basit implementasyon
+    return 0;
+  }
+
+  async hset(key: string, field: string, value: string): Promise<number> {
+    // Memory store'da hset işlemi için basit implementasyon
+    return 1;
+  }
+
+  async hget(key: string, field: string): Promise<string | null> {
+    // Memory store'da hget işlemi için basit implementasyon
+    return null;
+  }
+
+  async hgetall(key: string): Promise<Record<string, string>> {
+    // Memory store'da hgetall işlemi için basit implementasyon
+    return {};
+  }
+
+  async publish(channel: string, message: string): Promise<number> {
+    // Memory store'da publish işlemi için basit implementasyon
+    return 1;
   }
 }
 

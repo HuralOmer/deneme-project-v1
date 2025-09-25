@@ -1,0 +1,167 @@
+<!-- Tracking Script -->
+<script>
+  (function() {
+    // Tracking configuration
+    const config = {
+      apiUrl: 'https://web-production-8c47.up.railway.app',
+      shop: '{{ shop.permanent_domain }}',
+      debug: true
+    };
+
+    // Generate unique visitor ID
+    function generateVisitorId() {
+      let visitorId = localStorage.getItem('tracking_visitor_id');
+      if (!visitorId) {
+        visitorId = 'visitor_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('tracking_visitor_id', visitorId);
+      }
+      return visitorId;
+    }
+
+    // Generate session ID
+    function generateSessionId() {
+      return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    // Tracking object
+    const tracker = {
+      visitorId: generateVisitorId(),
+      sessionId: generateSessionId(),
+      config: config,
+      heartbeatInterval: null,
+
+      // Initialize tracking
+      init: function() {
+        console.log('🚀 Tracking initialized for shop:', this.config.shop);
+        this.trackPageView();
+        this.startHeartbeat();
+        this.setupEventListeners();
+      },
+
+      // Track page view
+      trackPageView: function() {
+        const payload = {
+          visitorId: this.visitorId,
+          sessionId: this.sessionId,
+          shop: this.config.shop,
+          timestamp: Date.now(),
+          activity: 'pageview',
+          userAgent: navigator.userAgent,
+          url: window.location.href,
+          referrer: document.referrer
+        };
+
+        this.sendData('/api/tracking/presence/beat', payload);
+      },
+
+      // Start heartbeat
+      startHeartbeat: function() {
+        this.heartbeatInterval = setInterval(() => {
+          this.sendHeartbeat();
+        }, 30000); // Her 30 saniyede bir
+      },
+
+      // Send heartbeat
+      sendHeartbeat: function() {
+        const payload = {
+          visitorId: this.visitorId,
+          sessionId: this.sessionId,
+          shop: this.config.shop,
+          timestamp: Date.now(),
+          activity: 'heartbeat',
+          userAgent: navigator.userAgent
+        };
+
+        this.sendData('/api/tracking/presence/beat', payload);
+      },
+
+      // Send data to backend
+      sendData: function(endpoint, payload) {
+        fetch(this.config.apiUrl + endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        }).then(response => {
+          if (this.config.debug) {
+            console.log('✅ Tracking data sent:', payload.activity);
+          }
+        }).catch(error => {
+          if (this.config.debug) {
+            console.log('❌ Tracking error:', error);
+          }
+        });
+      },
+
+      // Setup event listeners
+      setupEventListeners: function() {
+        const self = this;
+
+        // Page unload
+        window.addEventListener('beforeunload', function() {
+          self.handleUnload();
+        });
+
+        window.addEventListener('pagehide', function() {
+          self.handleUnload();
+        });
+
+        // Visibility change (tab switch)
+        document.addEventListener('visibilitychange', function() {
+          if (document.hidden) {
+            // Tab hidden - stop heartbeat
+            if (self.heartbeatInterval) {
+              clearInterval(self.heartbeatInterval);
+            }
+          } else {
+            // Tab visible - restart heartbeat
+            self.startHeartbeat();
+            self.sendHeartbeat();
+          }
+        });
+      },
+
+      // Handle page unload
+      handleUnload: function() {
+        const payload = {
+          visitorId: this.visitorId,
+          sessionId: this.sessionId,
+          shop: this.config.shop,
+          timestamp: Date.now(),
+          activity: 'unload',
+          userAgent: navigator.userAgent
+        };
+
+        // sendBeacon yerine fetch kullan (daha güvenilir)
+        fetch(this.config.apiUrl + '/api/tracking/presence/beat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload),
+          keepalive: true // sendBeacon benzeri davranış
+        }).catch(error => {
+          console.log('Unload heartbeat failed:', error);
+        });
+
+        // Heartbeat'i durdur
+        if (this.heartbeatInterval) {
+          clearInterval(this.heartbeatInterval);
+        }
+      }
+    };
+
+    // Start tracking when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function() {
+        tracker.init();
+      });
+    } else {
+      tracker.init();
+    }
+
+    // Make tracker globally available for debugging
+    window.tracker = tracker;
+  })();
+</script>

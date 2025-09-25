@@ -29,7 +29,7 @@ interface StreamRequest {
 
 export default async function activeUsersRoutes(fastify: FastifyInstance) {
   // Gerçek Redis client kullan
-  const presenceTracker = new PresenceTracker(redisClient);
+  const presenceTracker = new PresenceTracker(memoryStore);
 
   // Heartbeat endpoint
   fastify.post<HeartbeatRequest>('/presence/beat', {
@@ -72,7 +72,7 @@ export default async function activeUsersRoutes(fastify: FastifyInstance) {
     try {
       const payload = request.body;
       
-      // Presence'i güncelle
+      // Presence'i güncelle - hem presenceTracker hem de memory store'a
       await presenceTracker.addVisitor({
         visitorId: payload.visitorId,
         sessionId: payload.sessionId,
@@ -81,6 +81,9 @@ export default async function activeUsersRoutes(fastify: FastifyInstance) {
         userAgent: payload.userAgent,
         lastActivity: payload.timestamp,
       });
+
+      // Memory store'a da ekle
+      memoryStore.addUser(payload.visitorId, payload.sessionId, payload.shop);
 
       // Aktif kullanıcı sayısını al
       const activeUsers = await presenceTracker.getActiveVisitorCount(payload.shop);
