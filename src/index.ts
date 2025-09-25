@@ -81,9 +81,7 @@ class ShopifyTrackingApp {
 }
 
 // Uygulamayı başlat
-if (require.main === module) {
-  const app = new ShopifyTrackingApp();
-  app.start();
-}
+const app = new ShopifyTrackingApp();
+app.start();
 
 export default ShopifyTrackingApp;
