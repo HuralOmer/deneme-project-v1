@@ -289,8 +289,8 @@ export default async function activeUsersRoutes(fastify: FastifyInstance) {
     try {
       const { shop = 'default-shop' } = request.query;
       
-      // Memory store'dan gerçek aktif kullanıcı sayısını al
-      const activeUsers = memoryStore.getActiveUsersCount(shop);
+      // Presence tracker'dan gerçek aktif kullanıcı sayısını al
+      const activeUsers = await presenceTracker.getActiveVisitorCount(shop);
       
       return reply.code(200).send({
         count: activeUsers,
@@ -338,8 +338,8 @@ export default async function activeUsersRoutes(fastify: FastifyInstance) {
     try {
       const { shop } = request.query;
       
-      // Memory store'dan gerçek aktif kullanıcı sayısını al
-      const activeUsers = memoryStore.getActiveUsersCount(shop);
+      // Presence tracker'dan gerçek aktif kullanıcı sayısını al
+      const activeUsers = await presenceTracker.getActiveVisitorCount(shop);
 
       const response: PresenceResponse = {
         success: true,
